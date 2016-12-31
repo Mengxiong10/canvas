@@ -417,11 +417,11 @@ var Fireworks = function(){
 	self.init();
 
   var initialLaunchCount = 10;
-  // while(initialLaunchCount--){
-  //   setTimeout(function(){
- 	// 	self.fireworks.push(new Firework(self.cw/2, self.ch, rand(50, self.cw-50), rand(50, self.ch/2)-50));
-  //   }, initialLaunchCount*200);
-  // }
+  while(initialLaunchCount--){
+    setTimeout(function(){
+ 		self.fireworks.push(new Firework(self.cw/2, self.ch, rand(50, self.cw-50), rand(50, self.ch/2)-50));
+    }, initialLaunchCount*200);
+  }
 
 }
 
