@@ -1,3 +1,10 @@
+
+
+var delayButton = document.getElementById('delay')
+
+var delay = delayButton.value * 1000
+
+
 var Fireworks = function(){
 	/*=============================================================================*/
 	/* Utility
@@ -163,6 +170,7 @@ var Fireworks = function(){
 	/* Firework Constructor
 	/*=============================================================================*/
 	var Firework = function(startX, startY, targetX, targetY){
+		this.startTime = Date.now()
 		this.x = startX;
 		this.y = startY;
 		this.startX = startX;
@@ -190,16 +198,6 @@ var Fireworks = function(){
 	Firework.prototype.update = function(index){
 		self.ctx.lineWidth = this.lineWidth;
 
-		vx = Math.cos(this.angle) * this.speed,
-		vy = Math.sin(this.angle) * this.speed;
-		this.speed *= 1 + this.acceleration;
-		this.coordLast[2].x = this.coordLast[1].x;
-		this.coordLast[2].y = this.coordLast[1].y;
-		this.coordLast[1].x = this.coordLast[0].x;
-		this.coordLast[1].y = this.coordLast[0].y;
-		this.coordLast[0].x = this.x;
-		this.coordLast[0].y = this.y;
-
 		if(self.showTarget){
 			if(this.targetRadius < 8){
 				this.targetRadius += .25 * self.dt;
@@ -207,44 +205,59 @@ var Fireworks = function(){
 				this.targetRadius = 1 * self.dt;
 			}
 		}
+		delay = delayButton.value * 1000
+		console.log(delay)
+		var now = Date.now()
+		if (now - this.startTime > delay) {
+			vx = Math.cos(this.angle) * this.speed,
+			vy = Math.sin(this.angle) * this.speed;
+			this.speed *= 1 + this.acceleration;
+			this.coordLast[2].x = this.coordLast[1].x;
+			this.coordLast[2].y = this.coordLast[1].y;
+			this.coordLast[1].x = this.coordLast[0].x;
+			this.coordLast[1].y = this.coordLast[0].y;
+			this.coordLast[0].x = this.x;
+			this.coordLast[0].y = this.y;
+			if(this.startX >= this.targetX){
+				if(this.x + vx <= this.targetX){
+					this.x = this.targetX;
+					this.hitX = true;
+				} else {
+					this.x += vx * self.dt;
+				}
+			} else {
+				if(this.x + vx >= this.targetX){
+					this.x = this.targetX;
+					this.hitX = true;
+				} else {
+					this.x += vx * self.dt;
+				}
+			}
 
-		if(this.startX >= this.targetX){
-			if(this.x + vx <= this.targetX){
-				this.x = this.targetX;
-				this.hitX = true;
+			if(this.startY >= this.targetY){
+				if(this.y + vy <= this.targetY){
+					this.y = this.targetY;
+					this.hitY = true;
+				} else {
+					this.y += vy * self.dt;
+				}
 			} else {
-				this.x += vx * self.dt;
+				if(this.y + vy >= this.targetY){
+					this.y = this.targetY;
+					this.hitY = true;
+				} else {
+					this.y += vy * self.dt;
+				}
 			}
-		} else {
-			if(this.x + vx >= this.targetX){
-				this.x = this.targetX;
-				this.hitX = true;
-			} else {
-				this.x += vx * self.dt;
+			if(this.hitX && this.hitY){
+				var randExplosion = rand(0, 9);
+				self.createParticles(this.targetX, this.targetY, this.hue);
+				self.fireworks.splice(index, 1);
 			}
+
 		}
 
-		if(this.startY >= this.targetY){
-			if(this.y + vy <= this.targetY){
-				this.y = this.targetY;
-				this.hitY = true;
-			} else {
-				this.y += vy * self.dt;
-			}
-		} else {
-			if(this.y + vy >= this.targetY){
-				this.y = this.targetY;
-				this.hitY = true;
-			} else {
-				this.y += vy * self.dt;
-			}
-		}
 
-		if(this.hitX && this.hitY){
-			var randExplosion = rand(0, 9);
-			self.createParticles(this.targetX, this.targetY, this.hue);
-			self.fireworks.splice(index, 1);
-		}
 	};
 
 	Firework.prototype.draw = function(){
@@ -326,26 +339,23 @@ var Fireworks = function(){
 		// 	}, 100);
 		// });
 
-		// $(self.canvas).on('mousedown', function(e){
-		// 	self.mx = e.pageX;
-		// 	self.my = e.pageY;
-		// 	self.currentHue = rand(self.hueMin, self.hueMax);
-		// 	self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
+		function eventLister (e) {
+			self.mx = e.pageX;
+			self.my = e.pageY;
+			self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
+		}
 
-		// 	$(self.canvas).on('mousemove.fireworks', function(e){
-		// 		self.mx = e.pageX;
-		// 		self.my = e.pageY;
-		// 		self.currentHue = rand(self.hueMin, self.hueMax);
-		// 		self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
-		// 	});
+		self.canvas.addEventListener('mousedown',function (e) {
+			self.mx = e.pageX;
+			self.my = e.pageY;
+			self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
+			self.canvas.addEventListener('mousemove', eventLister);
+		})
+		self.canvas.addEventListener('mouseup',function (e) {
+			self.canvas.removeEventListener('mousemove', eventLister)
+		})
 
-		// });
-
-		// $(self.canvas).on('mouseup', function(e){
-		// 	$(self.canvas).off('mousemove.fireworks');
-		// });
-
-	  self.canvas.addEventListener('touchstart', function start (e) {
+	  self.canvas.addEventListener('touchstart', function (e) {
 	  	e.preventDefault()
 	  	for(var i = 0, length1 = e.changedTouches.length; i < length1; i++){
 		  	self.mx = e.changedTouches[i].pageX;
@@ -353,7 +363,7 @@ var Fireworks = function(){
 				self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
 	  	}
 	  })
-  	self.canvas.addEventListener('touchmove',function move (e) {
+  	self.canvas.addEventListener('touchmove',function (e) {
   		e.preventDefault()
 	  	for(var i = 0, length1 = e.changedTouches.length; i < length1; i++){
 		  	self.mx = e.changedTouches[i].pageX;
