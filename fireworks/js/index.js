@@ -4,6 +4,9 @@ var delayButton = document.getElementById('delay')
 
 var delay = delayButton.value * 1000
 
+delayButton.onclick = function () {
+	this.style.opacity = 1
+}
 
 var Fireworks = function(){
 	/*=============================================================================*/
@@ -11,7 +14,10 @@ var Fireworks = function(){
 	/*=============================================================================*/
 	var self = this;
 	var rand = function(rMi, rMa){return ~~((Math.random()*(rMa-rMi+1))+rMi);}
-	var hitTest = function(x1, y1, w1, h1, x2, y2, w2, h2){return !(x1 + w1 < x2 || x2 + w2 < x1 || y1 + h1 < y2 || y2 + h2 < y1);};
+	var hitTest = function(x1, y1, w1, h1, x2, y2, w2, h2){
+		var test = !(x1 + w1 < x2 || x2 + w2 < x1 || y1 + h1 < y2 || y2 + h2 < y1)
+		return test
+	};
 	window.requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(a){window.setTimeout(a,1E3/60)}}();
 
 	/*=============================================================================*/
@@ -71,6 +77,7 @@ var Fireworks = function(){
 	var Particle = function(x, y, hue){
 		this.x = x;
 		this.y = y;
+		this.radius = 0;
 		this.coordLast = [
 			{x: x, y: y},
 			{x: x, y: y},
@@ -78,7 +85,7 @@ var Fireworks = function(){
 		];
 		this.angle = rand(0, 360);
 		this.speed = rand(((self.partSpeed - self.partSpeedVariance) <= 0) ? 1 : self.partSpeed - self.partSpeedVariance, (self.partSpeed + self.partSpeedVariance));
-		this.friction = 1 - self.partFriction/100;
+		this.friction = 0.9 - self.partFriction/100;
 		this.gravity = self.partGravity/2;
 		this.hue = rand(hue-self.hueVariance, hue+self.hueVariance);
 		this.brightness = rand(50, 80);
@@ -206,7 +213,6 @@ var Fireworks = function(){
 			}
 		}
 		delay = delayButton.value * 1000
-		console.log(delay)
 		var now = Date.now()
 		if (now - this.startTime > delay) {
 			vx = Math.cos(this.angle) * this.speed,
@@ -411,11 +417,11 @@ var Fireworks = function(){
 	self.init();
 
   var initialLaunchCount = 10;
-  while(initialLaunchCount--){
-    setTimeout(function(){
- 		self.fireworks.push(new Firework(self.cw/2, self.ch, rand(50, self.cw-50), rand(50, self.ch/2)-50));
-    }, initialLaunchCount*200);
-  }
+  // while(initialLaunchCount--){
+  //   setTimeout(function(){
+ 	// 	self.fireworks.push(new Firework(self.cw/2, self.ch, rand(50, self.cw-50), rand(50, self.ch/2)-50));
+  //   }, initialLaunchCount*200);
+  // }
 
 }
 
