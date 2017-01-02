@@ -38,7 +38,7 @@ var Fireworks = function(){
 		self.canvas.height = self.ch = window.innerHeight;
 
 		self.particles = [];
-		self.partCount = 30;
+		self.partCount = 100;
 		self.fireworks = [];
 		self.mx = self.cw/2;
 		self.my = self.ch/2;
@@ -54,7 +54,7 @@ var Fireworks = function(){
 		self.fworkAccel = 4;
 		self.hueVariance = 20;
 		self.flickerDensity = 20;
-		self.showShockwave = false;
+		self.showShockwave = true;
 		self.showTarget = true;
 		self.clearAlpha = 25;
 
@@ -85,7 +85,7 @@ var Fireworks = function(){
 		];
 		this.angle = rand(0, 360);
 		this.speed = rand(((self.partSpeed - self.partSpeedVariance) <= 0) ? 1 : self.partSpeed - self.partSpeedVariance, (self.partSpeed + self.partSpeedVariance));
-		this.friction = 0.9 - self.partFriction/100;
+		this.friction = 0.95 - self.partFriction/100;
 		this.gravity = self.partGravity/2;
 		this.hue = rand(hue-self.hueVariance, hue+self.hueVariance);
 		this.brightness = rand(50, 80);
@@ -348,13 +348,13 @@ var Fireworks = function(){
 		function eventLister (e) {
 			self.mx = e.pageX;
 			self.my = e.pageY;
-			self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
+			var startX = rand(1/4*self.cw,3/4*self.cw)
+			var startY = self.ch - 20
+			self.createFireworks(startX, startY, self.mx, self.my);
 		}
 
 		self.canvas.addEventListener('mousedown',function (e) {
-			self.mx = e.pageX;
-			self.my = e.pageY;
-			self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
+			eventLister(e)
 			self.canvas.addEventListener('mousemove', eventLister);
 		})
 		self.canvas.addEventListener('mouseup',function (e) {
@@ -364,19 +364,15 @@ var Fireworks = function(){
 	  self.canvas.addEventListener('touchstart', function (e) {
 	  	e.preventDefault()
 	  	for(var i = 0, length1 = e.changedTouches.length; i < length1; i++){
-		  	self.mx = e.changedTouches[i].pageX;
-				self.my = e.changedTouches[i].pageY;
-				self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
+	  		eventLister(e.changedTouches[i])
 	  	}
 	  })
-  	self.canvas.addEventListener('touchmove',function (e) {
-  		e.preventDefault()
-	  	for(var i = 0, length1 = e.changedTouches.length; i < length1; i++){
-		  	self.mx = e.changedTouches[i].pageX;
-				self.my = e.changedTouches[i].pageY;
-				self.createFireworks(self.cw/2, self.ch, self.mx, self.my);
-	  	}
-  	})
+  	// self.canvas.addEventListener('touchmove',function (e) {
+  	// 	e.preventDefault()
+	  // 	for(var i = 0, length1 = e.changedTouches.length; i < length1; i++){
+	  // 		eventLister(e.changedTouches[i])
+	  // 	}
+  	// })
 	}
 
 	/*=============================================================================*/
